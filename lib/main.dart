@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:file_storage_mini_project/home/homePage.dart';
 import 'package:flutter/material.dart';
 
@@ -12,14 +14,20 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      scrollBehavior: ScrollBehavior().copyWith(
+        dragDevices: {
+          PointerDeviceKind.mouse,
+          PointerDeviceKind.touch,
+          PointerDeviceKind.trackpad,
+        },
+      ),
       title: 'Flutter Demo',
       theme: ThemeData(
-
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: .fromSeed(
+          seedColor: Colors.deepPurple,
+        ),
       ),
       home: Homepage(),
     );
   }
 }
-
-

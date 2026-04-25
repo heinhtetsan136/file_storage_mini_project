@@ -79,4 +79,11 @@ class FileService {
         .cast<File>()
         .toList();
   }
+
+  Future<String> readFile(String path) async {
+    final Directory root = await getDirectory();
+    final file = File("${root.path}/$path");
+    final String text = await file.readAsString();
+    return text;
+  }
 }
