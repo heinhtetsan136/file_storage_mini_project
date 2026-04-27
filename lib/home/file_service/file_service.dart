@@ -102,4 +102,46 @@ class FileService {
     );
     currentFolder.delete(recursive: true);
   }
+
+  Future<void> renameFile(
+    String oldPath,
+    String newPath, {
+    required Function(String str) status,
+  }) async {
+    final Directory root = await getDirectory();
+    final currentFile = File(
+      "${root.path}/$oldPath",
+    );
+    final String newFileName =
+        "${root.path}/$newPath";
+    final newFile = File(newFileName);
+    if (newFile.existsSync()) {
+      throw Exception("Folder already exists");
+    }
+    final directory = await currentFile.rename(
+      newFileName,
+    );
+    print("new directory=$directory");
+  }
+
+  Future<void> renameFolder(
+    String oldPath,
+    String newPath, {
+    required Function(String str) status,
+  }) async {
+    final Directory root = await getDirectory();
+    final currentFolder = Directory(
+      "${root.path}/$oldPath",
+    );
+    final String newFolderPath =
+        "${root.path}/$newPath";
+    final newFolder = Directory(newFolderPath);
+    if (newFolder.existsSync()) {
+      throw Exception("Folder already exists");
+    }
+    final directory = await currentFolder.rename(
+      newFolderPath,
+    );
+    print("new directory=$directory");
+  }
 }

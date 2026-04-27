@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:file_storage_mini_project/home/file_service/creat_new_file_dialog.dart';
-import 'package:file_storage_mini_project/home/file_service/create_new_folder_dialog.dart';
+import 'package:file_storage_mini_project/home/file_service/creat_new_or_rename_file_dialog.dart';
+import 'package:file_storage_mini_project/home/file_service/create_new_or_rename_folder_dialog.dart';
 import 'package:file_storage_mini_project/home/file_service/delete_dialog.dart';
 import 'package:file_storage_mini_project/home/file_service/file_service.dart';
 import 'package:file_storage_mini_project/note_pad_screen.dart';
@@ -23,6 +23,80 @@ class _HomepageState extends State<Homepage> {
   List<File> _listofFile = [];
   String _currentLocation = "";
 
+  void _deleteFolder({
+    required String folderLocation,
+    required String folderName,
+    required BuildContext context,
+  }) async {
+    try {
+      await _fileService.deleteFolder(
+        folderLocation,
+      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.green,
+            content: Text(
+              "Delete success $folderName",
+            ),
+          ),
+        );
+      }
+      _loadFileandFolder(_currentLocation);
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.red,
+            content: Text(
+              "Delete Failed $folderName",
+            ),
+          ),
+        );
+      }
+    }
+  }
+
+  void _deleteFile({
+    required String fileLocation,
+    required String fileName,
+    required BuildContext context,
+  }) async {
+    try {
+      await _fileService.deleteFile(fileLocation);
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.green,
+            content: Text(
+              "Delete success $fileName",
+            ),
+          ),
+        );
+      }
+      _loadFileandFolder(_currentLocation);
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.red,
+            content: Text(
+              "Delete Failed $fileName",
+            ),
+          ),
+        );
+      }
+    }
+  }
+
   void _loadFileandFolder(String path) async {
     _listOfFolder = await _fileService
         .getListOfFolder(path);
@@ -43,8 +117,38 @@ class _HomepageState extends State<Homepage> {
     bool isOk = await showDialog(
       context: context,
       builder: (context) {
-        return CreateNewFolderDialog(
+        return CreateorRenameNewFolderDialog(
           currentLocation: "$_currentLocation/",
+        );
+      },
+    );
+    if (isOk == true) {
+      _loadFileandFolder(_currentLocation);
+    }
+  }
+
+  void _renameFolder(String oldName) async {
+    bool isOk = await showDialog(
+      context: context,
+      builder: (context) {
+        return CreateorRenameNewFolderDialog(
+          currentLocation: "$_currentLocation/",
+          oldName: oldName,
+        );
+      },
+    );
+    if (isOk) {
+      _loadFileandFolder(_currentLocation);
+    }
+  }
+
+  void _renameFile(String oldName) async {
+    bool isOk = await showDialog(
+      context: context,
+      builder: (context) {
+        return CreateNewOrRenameFileDialog(
+          currentLocation: "$_currentLocation/",
+          oldName: oldName,
         );
       },
     );
@@ -58,7 +162,7 @@ class _HomepageState extends State<Homepage> {
     bool isOK = await showDialog(
       context: context,
       builder: (context) {
-        return CreateNewFileDialog(
+        return CreateNewOrRenameFileDialog(
           currentLocation: '$_currentLocation/',
         );
       },
@@ -155,51 +259,15 @@ class _HomepageState extends State<Homepage> {
                   trailing: PopupMenuButton(
                     onSelected: (str) async {
                       if (str == "delete") {
-                        final bool? isDelete =
-                            await showDialog(
-                              context: context,
-                              builder: (_) {
-                                return DeleteDialog(
-                                  title:
-                                      foldername,
-                                );
-                              },
-                            );
-                        if (isDelete == true) {
-                          try {
-                            await _fileService
-                                .deleteFolder(
-                                  "$_currentLocation/$foldername",
-                                );
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(
-                                context,
-                              ).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    "Sucessfully deleted",
-                                  ),
-                                ),
-                              );
-
-                              _loadFileandFolder(
-                                _currentLocation,
-                              );
-                            }
-                          } catch (e) {
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(
-                                context,
-                              ).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    "Failed to delete: $e",
-                                  ),
-                                ),
-                              );
-                            }
-                          }
-                        }
+                        _deleteFolder(
+                          folderLocation:
+                              folderlocation,
+                          folderName: foldername,
+                          context: context,
+                        );
+                      }
+                      if (str == "rename") {
+                        _renameFolder(foldername);
                       }
                     },
                     itemBuilder: (_) {
@@ -276,6 +344,33 @@ class _HomepageState extends State<Homepage> {
                         .statSync()
                         .changed
                         .toString(),
+                  ),
+                  trailing: PopupMenuButton(
+                    onSelected: (String str) {
+                      if (str == "delete") {
+                        _deleteFile(
+                          fileLocation:
+                              "$_currentLocation/$fileName",
+                          fileName: fileName,
+                          context: context,
+                        );
+                      }
+                      if (str == "rename") {
+                        _renameFile(fileName);
+                      }
+                    },
+                    itemBuilder: (_) {
+                      return [
+                        PopupMenuItem(
+                          child: Text("Rename"),
+                          value: "rename",
+                        ),
+                        PopupMenuItem(
+                          child: Text("Delete"),
+                          value: "delete",
+                        ),
+                      ];
+                    },
                   ),
                 );
               },
