@@ -1,9 +1,25 @@
 import 'dart:io';
 
+import 'package:file_saver/file_saver.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:path_provider/path_provider.dart';
 
 class FileService {
+  final FileSaver _fileSaver = FileSaver.instance;
+
+  Future<String?> exportFile(
+    String name,
+    File file,
+  ) async {
+    final result = await _fileSaver.saveAs(
+      bytes: file.readAsBytesSync(),
+      name: name,
+      fileExtension: "txt",
+      mimeType: MimeType.text,
+    );
+    return result;
+  }
+
   Future<Directory> getDirectory() {
     return getApplicationDocumentsDirectory();
   }

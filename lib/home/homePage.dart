@@ -399,6 +399,11 @@ class _HomepageState extends State<Homepage> {
                       }
                       if (str == "rename") {
                         _renameFile(fileName);
+                      } else {
+                        _exportfile(
+                          fileName,
+                          file,
+                        );
                       }
                     },
                     itemBuilder: (_) {
@@ -411,6 +416,10 @@ class _HomepageState extends State<Homepage> {
                           child: Text("Delete"),
                           value: "delete",
                         ),
+                        PopupMenuItem(
+                          child: Text("Export"),
+                          value: "export",
+                        ),
                       ];
                     },
                   ),
@@ -419,6 +428,21 @@ class _HomepageState extends State<Homepage> {
               itemCount: _listofFile.length,
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  void _exportfile(String name, File file) async {
+    final result = await _fileService.exportFile(
+      name,
+      file,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: Colors.green,
+        content: Text(
+          "File have Saved at $result",
         ),
       ),
     );
