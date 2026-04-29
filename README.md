@@ -10,7 +10,7 @@ This project is a minimalist File Explorer application built with Flutter. The m
 - **Create Text File**: Users can create simple text files within folders.
 - **Delete**: Both files and folders can be deleted (including non-empty folders with confirmation).
 - **Rename**: Users can rename any file or folder.
-- **Export**: Files and folders can be exported from the application's document directory (e.g., sharing or moving outside the app scope).
+- **Export**: Files can be exported from the application's document directory (e.g., sharing or moving outside the app scope).
 
 All data (folders and text files) is managed directly in the application's document directory using standard Dart file IO APIs.
 
