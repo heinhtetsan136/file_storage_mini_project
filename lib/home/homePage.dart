@@ -184,7 +184,7 @@ class _HomepageState extends State<Homepage> {
     final List<String> dir =
         _currentLocation.split("/")
           ..removeWhere((e) => e.isEmpty);
-    int _i = 0;
+
     return Scaffold(
       appBar: AppBar(
         title: Text("File Explorer"),
@@ -280,30 +280,36 @@ class _HomepageState extends State<Homepage> {
                 ),
                 title: _currentLocation.isEmpty
                     ? Text("/")
-                    : Row(
-                        children: dir.map((e) {
-                          int _i = dir.indexOf(e);
+                    : SingleChildScrollView(
+                        scrollDirection:
+                            Axis.horizontal,
+                        child: Row(
+                          children: dir.map((e) {
+                            int _i = dir.indexOf(
+                              e,
+                            );
 
-                          return InkWell(
-                            onTap: () {
-                              dir.removeRange(
-                                _i + 1,
-                                dir.length,
-                              );
-
-                              _currentLocation =
-                                  dir.join("/");
-
-                              setState(() {
-                                _loadFileandFolder(
-                                  _currentLocation,
+                            return InkWell(
+                              onTap: () {
+                                dir.removeRange(
+                                  _i + 1,
+                                  dir.length,
                                 );
-                              });
-                            },
 
-                            child: Text("/ $e"),
-                          );
-                        }).toList(),
+                                _currentLocation =
+                                    dir.join("/");
+
+                                setState(() {
+                                  _loadFileandFolder(
+                                    _currentLocation,
+                                  );
+                                });
+                              },
+
+                              child: Text("/ $e"),
+                            );
+                          }).toList(),
+                        ),
                       ),
               ),
             ),
